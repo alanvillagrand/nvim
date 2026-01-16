@@ -8,6 +8,7 @@ return {
         "ts_ls",
         "pyright",
         "clangd",
+        "rust_analyzer",
       },
     },
     dependencies = {
