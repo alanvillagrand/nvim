@@ -15,6 +15,35 @@ return {
     vim.lsp.config("*", {
       capabilities = capabilities,
     })
+
+    -- Enable text highlighting
+    vim.api.nvim_create_autocmd("LspAttach", {
+    callback = function(ev)
+      local client = vim.lsp.get_client_by_id(ev.data.client_id)
+
+      -- Only enable if the server supports it
+      if not client or not client.server_capabilities.documentHighlightProvider then
+        return
+      end
+
+      local group = vim.api.nvim_create_augroup("lsp_document_highlight", { clear = false })
+
+      -- Highlight references under cursor
+      vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+        group = group,
+        buffer = ev.buf,
+        callback = vim.lsp.buf.document_highlight,
+      })
+
+      -- Clear highlights when cursor moves
+      vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+        group = group,
+        buffer = ev.buf,
+        callback = vim.lsp.buf.clear_references,
+      })
+    end,
+    })
+
   end,
 }
 
